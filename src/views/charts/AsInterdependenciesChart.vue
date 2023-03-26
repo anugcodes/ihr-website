@@ -1,5 +1,6 @@
 <template>
   <div class="IHR_chart">
+    <as-graph-chart :asNumber="asNumber" :hegemonyValues="hegeSummary" :plot="asGraphPlot" class="col-6" />
     <reactive-chart :layout="layout" :traces="traces" @plotly-click="plotClick" :ref="myId" :no-data="noData" />
     <div v-if="loading" class="IHR_loading-spinner">
       <q-spinner color="secondary" size="15em" />
@@ -11,27 +12,13 @@
             <div class="text-h3">{{ details.date | ihrUtcString }}</div>
           </div>
           <div class="col-auto">
-            <q-btn
-              class="IHR_table-close-button"
-              size="sm"
-              round
-              flat
-              @click="details.tableVisible = false"
-              icon="fa fa-times-circle"
-            ></q-btn>
+            <q-btn class="IHR_table-close-button" size="sm" round flat @click="details.tableVisible = false"
+              icon="fa fa-times-circle"></q-btn>
           </div>
         </div>
       </q-card-section>
-      <q-tabs
-        dense
-        v-model="details.activeTab"
-        class="table-card text-grey inset-shadow"
-        indicator-color="secondary"
-        active-color="primary"
-        active-bg-color="white"
-        align="justify"
-        narrow-indicator
-      >
+      <q-tabs dense v-model="details.activeTab" class="table-card text-grey inset-shadow" indicator-color="secondary"
+        active-color="primary" active-bg-color="white" align="justify" narrow-indicator>
         <q-tab name="dependency" :label="$t('charts.asInterdependencies.table.dependencyTitle')" />
         <q-tab name="dependent" :label="$t('charts.asInterdependencies.table.dependentTitle')" />
         <q-tab name="bgpPlay" label="AS Graph" />
@@ -42,7 +29,8 @@
           <as-interdependencies-table :data="networkDependencyData" :loading="details.tablesData.dependency.loading" />
         </q-tab-panel>
         <q-tab-panel name="dependent">
-          <as-interdependencies-table :data="dependentNetworksData" use-origin-asn :loading="details.tablesData.dependent.loading" />
+          <as-interdependencies-table :data="dependentNetworksData" use-origin-asn
+            :loading="details.tablesData.dependent.loading" />
         </q-tab-panel>
         <q-tab-panel name="bgpPlay">
           <div class="bgplay-container">
@@ -87,6 +75,7 @@ import { AS_INTERDEPENDENCIES_LAYOUT } from './layouts'
 import i18n from '@/locales/i18n'
 import { HegemonyQuery, HegemonyConeQuery, AS_FAMILY } from '@/plugins/IhrApi'
 import ripeApi from '@/plugins/RipeApi'
+import AsGraphChart from './AsGraphChart.vue';
 
 const DEFAULT_TRACE = [
   {
@@ -106,6 +95,7 @@ export default {
   mixins: [CommonChartMixin],
   components: {
     AsInterdependenciesTable,
+    AsGraphChart,
   },
   props: {
     asNumber: {
@@ -145,6 +135,8 @@ export default {
       traces: DEFAULT_TRACE,
       layout: AS_INTERDEPENDENCIES_LAYOUT,
       neighbours: [],
+      hegeSummary: {},
+      asGraphPlot: 1,
     }
   },
   beforeMount() {
@@ -312,6 +304,8 @@ export default {
       let anotherAsn
       let minX, maxX
       data.forEach(elem => {
+        this.hegeSummary[elem.asn] = elem.hege;
+
         if (elem.asn == this.asNumber) return
         let trace = traces[elem.asn]
 
@@ -369,7 +363,7 @@ export default {
       })
       this.noData |= Object.keys(traces).length == 0
       this.layout.datarevision = new Date().getTime()
-
+      this.asGraphPlot += 1;
       // console.log('md', missingDataList)
 
       let shapeList = []
@@ -496,9 +490,9 @@ export default {
       //console.log(this.traces.length)
       //console.log(traces)
 
-      if(this.traces.length > 12){
+      if (this.traces.length > 12) {
         this.layout.showlegend = false
-      }else{
+      } else {
         this.layout.showlegend = true
       }
     },

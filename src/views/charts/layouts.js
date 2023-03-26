@@ -100,6 +100,11 @@ var RIR_COUNTRY_SUNBURST_LAYOUT = {
   margin: { l: 5, r: 5, b: 5, t: 5 },
 }
 
+var ASGRAPH_LAYOUT = {
+};
+
+
+
 export {
   COMMON_FEATURE,
   HEGEMONY_ALARMS_LAYOUT,
@@ -110,4 +115,5 @@ export {
   DELAY_CHART_LAYOUT,
   NET_DELAY_LAYOUT,
   RIR_COUNTRY_SUNBURST_LAYOUT,
+  ASGRAPH_LAYOUT,
 }
